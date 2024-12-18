@@ -1,0 +1,196 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{CJKutf8}
+\usepackage{setspace}
+
+\title{数字信号处理公式汇总 (DTFT, DFT, Z-Transform, Filter)}
+\author{}
+\date{}
+
+\begin{document}
+\begin{CJK}{UTF8}{gbsn}
+\maketitle
+\onehalfspacing
+
+本文档汇总了数字信号处理 (DSP) 中与 DTFT、DFT、Z-变换以及滤波器设计相关的经典公式与常用表达式，以供复习与参考。
+
+\section{离散时间傅里叶变换 (DTFT)}
+
+\subsection{定义与逆变换}
+\[
+X(e^{j\omega}) = \sum_{n=-\infty}^{\infty} x[n] e^{-j \omega n}
+\]
+\[
+x[n] = \frac{1}{2\pi}\int_{-\pi}^{\pi} X(e^{j\omega}) e^{j\omega n} d\omega
+\]
+
+\subsection{DTFT 重要性质}
+\begin{enumerate}
+\item 线性性：  
+若 \(y[n] = a x_1[n] + b x_2[n]\)，则  
+\[
+Y(e^{j\omega}) = a X_1(e^{j\omega}) + b X_2(e^{j\omega})
+\]
+
+\item 时间移位：  
+\[
+x[n-n_0] \xleftrightarrow{\text{DTFT}} e^{-j\omega n_0} X(e^{j\omega})
+\]
+
+\item 频率移位：  
+\[
+e^{j\omega_0 n}x[n] \xleftrightarrow{\text{DTFT}} X(e^{j(\omega-\omega_0)})
+\]
+
+\item 卷积与频域相乘：  
+\((x_1 * x_2)[n] \xleftrightarrow{\text{DTFT}} X_1(e^{j\omega})X_2(e^{j\omega})\)
+
+\item Parseval 定理：  
+\[
+\sum_{n=-\infty}^{\infty} |x[n]|^2 = \frac{1}{2\pi}\int_{-\pi}^{\pi} |X(e^{j\omega})|^2 d\omega
+\]
+\end{enumerate}
+
+\subsection{常见序列的 DTFT}
+\[
+\delta[n] \xleftrightarrow{\text{DTFT}} 1
+\]
+\[
+u[n] \xleftrightarrow{\text{DTFT}} \frac{1}{1 - e^{-j\omega}} \ (|\omega|\neq 0)
+\]
+\[
+a^n u[n] \xleftrightarrow{\text{DTFT}} \frac{1}{1 - a e^{-j\omega}},\ |a|<1
+\]
+
+\section{离散傅里叶变换 (DFT)}
+
+\subsection{定义与逆变换}
+DFT 定义：
+\[
+X[k] = \sum_{n=0}^{N-1} x[n] e^{-j\frac{2\pi}{N}nk}, \quad k=0,\ldots,N-1
+\]
+
+IDFT 定义：
+\[
+x[n] = \frac{1}{N}\sum_{k=0}^{N-1} X[k] e^{j\frac{2\pi}{N}nk}, \quad n=0,\ldots,N-1
+\]
+
+\subsection{DFT 重要性质}
+\begin{enumerate}
+\item 线性性：
+\[
+a x_1[n] + b x_2[n] \xleftrightarrow{\text{DFT}} a X_1[k] + b X_2[k]
+\]
+
+\item 循环卷积：
+若 \(y[n]\) 为长度 N 的循环卷积 \((x_1 \circledast x_2)[n]\)，则
+\[
+Y[k] = X_1[k] X_2[k]
+\]
+
+\item Parseval 定理：
+\[
+\sum_{n=0}^{N-1} |x[n]|^2 = \frac{1}{N}\sum_{k=0}^{N-1} |X[k]|^2
+\]
+
+\item DFT 与 DTFT 的关系：DFT 是 DTFT 在频率上的抽样（针对有限长序列）。
+\end{enumerate}
+
+\section{Z-变换 (Z-Transform)}
+
+\subsection{定义与逆变换}
+\[
+X(z) = \sum_{n=-\infty}^{\infty} x[n] z^{-n}, \quad z=re^{j\theta}
+\]
+
+逆 Z-变换可通过部分分式展开、查表或留数定理求得。
+
+\subsection{常用 Z-变换对照表}
+\[
+\delta[n] \xleftrightarrow{Z} 1
+\]
+\[
+u[n] \xleftrightarrow{Z} \frac{1}{1-z^{-1}},\ |z|>1
+\]
+\[
+a^n u[n] \xleftrightarrow{Z} \frac{1}{1 - a z^{-1}},\ |z|>|a|
+\]
+
+\subsection{Z-变换性质}
+\begin{enumerate}
+\item 线性性：
+\[
+a x_1[n] + b x_2[n] \xleftrightarrow{Z} a X_1(z) + b X_2(z)
+\]
+
+\item 时间移位：
+\[
+x[n-n_0]u[n-n_0] \xleftrightarrow{Z} z^{-n_0} X(z)
+\]
+
+\item 卷积：
+\[
+(x_1 * x_2)[n] \xleftrightarrow{Z} X_1(z)X_2(z)
+\]
+
+\item 与 DTFT 的关系：当 \(z=e^{j\omega}\) 时，Z-变换在单位圆上即为 DTFT。
+\end{enumerate}
+
+\section{滤波器 (Filter)}
+
+\subsection{系统函数与滤波器类型}
+给定 LTI 系统差分方程：
+\[
+\sum_{k=0}^{M} a_k y[n-k] = \sum_{l=0}^{N} b_l x[n-l]
+\]
+Z 域：
+\[
+H(z) = \frac{Y(z)}{X(z)} = \frac{\sum_{l=0}^{N} b_l z^{-l}}{\sum_{k=0}^{M} a_k z^{-k}}
+\]
+
+\subsection{FIR 滤波器}
+FIR 滤波器脉冲响应 \(h[n]\) 有限长，频率响应：
+\[
+H(e^{j\omega}) = \sum_{n=0}^{N-1} h[n] e^{-j\omega n}
+\]
+
+典型设计方法：窗口法设计低通滤波器时，理想低通滤波器频率响应为：
+\[
+H_d(e^{j\omega}) =
+\begin{cases}
+1, & |\omega| < \omega_c \\
+0, & |\omega| > \omega_c
+\end{cases}
+\]
+利用理想低通滤波器的脉冲响应 (sinc 函数) 截断并乘以窗函数获得 \(h[n]\)。
+
+\subsection{IIR 滤波器}
+IIR 滤波器通过模拟滤波器变换获得。如双线性变换：
+\[
+s = \frac{2}{T}\frac{z-1}{z+1}
+\]
+从模拟域巴特沃斯、切比雪夫滤波器传递函数 \(H_a(s)\) 替换 \(s\) 得到数字 \(H(z)\)。
+
+\section{附加公式与概念}
+
+\subsection{双线性变换}
+\[
+z = \frac{1 + \frac{sT}{2}}{1 - \frac{sT}{2}}, \quad s = \frac{2}{T}\frac{z-1}{z+1}
+\]
+
+\subsection{离散卷积定义}
+\[
+y[n] = (x*h)[n] = \sum_{m=-\infty}^{\infty} x[m] h[n-m]
+\]
+
+\subsection{相关函数定义}
+自相关与互相关在 DSP 中用于分析信号特性：
+\[
+r_{xx}[\tau] = \sum_{n=-\infty}^{\infty} x[n]x[n-\tau]^*
+\]
+
+以上即为数字信号处理 (DTFT, DFT, Z-变换, Filter) 的主要公式汇总。
+
+\end{CJK}
+\end{document}
